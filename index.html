@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GlowGleam - Makeup & Skincare Store</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif;}
+header{position:sticky;top:0;background:#ffe4ec;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;z-index:10;}
+header h1{color:#d63384;font-size:1.5rem;}
+nav a{margin:0 10px;text-decoration:none;color:#d63384;font-weight:bold;}
+.search-bar input{padding:5px;border:1px solid #ccc;border-radius:5px;}
+.cart{position:relative;cursor:pointer;}
+.cart-count{position:absolute;top:-5px;right:-10px;background:#d63384;color:#fff;border-radius:50%;padding:2px 6px;font-size:0.8rem;}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;padding:20px;}
+.product{background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.1);padding:10px;text-align:center;position:relative;overflow:hidden;}
+.product img{width:100%;height:180px;object-fit:cover;border-radius:10px;transition:transform 0.5s;}
+.product:hover img{transform:scale(1.05);}
+.product h2{color:#d63384;font-size:1rem;margin:5px 0;}
+.product p{font-size:0.9rem;margin:5px 0;}
+.product button{background:#d63384;color:#fff;border:none;padding:8px 12px;border-radius:5px;cursor:pointer;}
+.product button:hover{background:#ad1e65;}
+.ad-banner{grid-column:1/-1;background:#d63384;color:#fff;text-align:center;padding:20px;font-size:1.2rem;animation:bounce 2s infinite;cursor:pointer;border-radius:10px;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+footer{text-align:center;padding:10px;background:#ffe4ec;font-size:0.9rem;}
+@media(max-width:600px){header{flex-direction:column;align-items:flex-start;}}
+</style>
+</head>
+<body>
+<header>
+<h1>GlowGleam</h1>
+<nav>
+<a href="#">Home</a>
+<a href="#shop">Shop</a>
+<a href="#contact">Contact</a>
+</nav>
+<div class="search-bar">
+<input type="text" id="search" placeholder="Search products..." onkeyup="searchProducts()" />
+</div>
+<div class="cart" onclick="showCart()">🛒<span class="cart-count" id="cart-count">0</span></div>
+</header>
+<section id="shop" class="grid"></section>
+<footer>© 2025 GlowGleam | Follow us on Instagram</footer>
+<script>
+const products = [
+{name:'Liquid Matte Lipstick',desc:'Long-lasting matte lipstick for bold looks.',price:'$12',rating:'⭐️⭐️⭐️⭐️',img:'https://tse2.mm.bing.net/th/id/OIP.5oO3tSYWKDlhDFugZhJG0wHaLH?pid=Api&P=0&h=220'},
+{name:'Glow Boost Vitamin C Serum',desc:'Brightens and revitalizes skin.',price:'$18',rating:'⭐️⭐️⭐️⭐️⭐️',img:'https://tse3.mm.bing.net/th/id/OIP.kVrXC7YOZUG_Q8Y_o1-SrwHaHg?pid=Api&P=0&h=220'},
+{name:'Hydrating Aloe Face Mask',desc:'Soothes and hydrates skin deeply.',price:'$10',rating:'⭐️⭐️⭐️⭐️',img:'https://tse3.mm.bing.net/th/id/OIP.DSj2Gy4jKG5J73t9G31WbgHaHa?pid=Api&P=0&h=220'},
+{name:'Flawless Coverage Foundation',desc:'Smooth, lightweight full coverage.',price:'$15',rating:'⭐️⭐️⭐️⭐️⭐️',img:'https://tse1.mm.bing.net/th/id/OIP._SVTy-AUGrPWO0YRJhGIswHaHa?pid=Api&P=0&h=220'},
+{name:'Rosy Blush Powder',desc:'Adds a natural flush to cheeks.',price:'$8',rating:'⭐️⭐️⭐️⭐️',img:'https://tse1.mm.bing.net/th/id/OIP.w3tgfWRUyc6x3HsD1C1AAgHaGo?pid=Api&P=0&h=220'},
+{name:'Daily Moisture Cream',desc:'Hydrates and softens skin all day.',price:'$14',rating:'⭐️⭐️⭐️⭐️',img:'https://tse1.mm.bing.net/th/id/OIP.OMHTGEe-E4qPc9LT7kUlRAHaHa?pid=Api&P=0&h=220'},
+{name:'SPF 50 Sunscreen',desc:'Protects against harmful UV rays.',price:'$13',rating:'⭐️⭐️⭐️⭐️⭐️',img:'https://tse4.mm.bing.net/th/id/OIP.mme7wPlllTSpoyU7Ru-pPQHaHa?pid=Api&P=0&h=220'},
+{name:'Hydrating Lip Gloss',desc:'Moisturizing glossy lips.',price:'$9',rating:'⭐️⭐️⭐️⭐️',img:'https://tse3.mm.bing.net/th/id/OIP.BbdHe0BG3IkYm5JPimE0HAHaHa?pid=Api&P=0&h=220'},
+{name:'Gentle Makeup Remover',desc:'Removes makeup gently and effectively.',price:'$11',rating:'⭐️⭐️⭐️⭐️',img:'https://tse1.mm.bing.net/th/id/OIP.WyvBwxkiObDIZXpcr1O03QAAAA?pid=Api&P=0&h=220'},
+{name:'Precision Eyeliner Pen',desc:'For sharp, defined eye looks.',price:'$7',rating:'⭐️⭐️⭐️⭐️⭐️',img:'https://tse1.mm.bing.net/th/id/OIP.7Tu7rkwXpg63OsXtS3UWBAHaHa?pid=Api&P=0&h=220'},
+{name:'Natural Brow Gel',desc:'Keeps brows in place naturally.',price:'$8',rating:'⭐️⭐️⭐️⭐️',img:'https://tse2.mm.bing.net/th/id/OIP.wKFXAReXqqtfmxdff-NRLAHaHa?pid=Api&P=0&h=220'},
+{name:'Refreshing Face Mist',desc:'Refreshes skin instantly.',price:'$10',rating:'⭐️⭐️⭐️⭐️',img:'https://tse2.mm.bing.net/th/id/OIP.3F6H2NNX2uepZUcaNtFnBAHaJC?pid=Api&P=0&h=220'},
+{name:'Tinted BB Cream',desc:'Light coverage for daily wear.',price:'$12',rating:'⭐️⭐️⭐️⭐️',img:'https://tse1.mm.bing.net/th/id/OIP.z6ezTf1t-6ppmv2QuSBBHgHaHa?pid=Api&P=0&h=220'},
+{name:'Shimmer Highlighter',desc:'Adds glow to cheekbones.',price:'$9',rating:'⭐️⭐️⭐️⭐️',img:'https://tse2.mm.bing.net/th/id/OIP.79WuGDO-UkFk3WksasH15QHaHa?pid=Api&P=0&h=220'},
+{name:'Nourishing Facial Oil',desc:'Deeply nourishes for glowing skin.',price:'$16',rating:'⭐️⭐️⭐️⭐️⭐️',img:'https://tse4.mm.bing.net/th/id/OIP.1Jt--bkWGJascbMQxXqBjgHaHa?pid=Api&P=0&h=220'},
+{name:'Repair Night Cream',desc:'Repairs and rejuvenates overnight.',price:'$17',rating:'⭐️⭐️⭐️⭐️⭐️',img:'https://tse1.mm.bing.net/th/id/OIP.WUXVjtjKVnYQJL7IXWAc7AHaGz?pid=Api&P=0&h=220'},
+{name:'Pore Minimizing Primer',desc:'Smooths skin before makeup.',price:'$13',rating:'⭐️⭐️⭐️⭐️',img:'https://tse3.mm.bing.net/th/id/OIP.0IgvGBqAz0iyUbBzOOV5NgHaHa?pid=Api&P=0&h=220'},
+{name:'Detox Clay Mask',desc:'Deep cleans pores for clear skin.',price:'$11',rating:'⭐️⭐️⭐️⭐️',img:'https://tse3.mm.bing.net/th/id/OIP.DFnkWeBh9cqYGPajOx3ZDgHaHa?pid=Api&P=0&h=220'},
+{name:'Moisturizing Lip Balm',desc:'Soft, hydrated lips.',price:'$6',rating:'⭐️⭐️⭐️⭐️⭐️',img:'https://i5.walmartimages.com/seo/Lip-Balm-Hydrating-Softening-Moisturizer-For-Very-Dry-Lips-Dermatologist-Created-Natural-Hypoallergenic-Moisturizing-Balms-Fruit-Flavored_5318ed84-1e9e-43c9-afbb-e7089b344f90.6c8cf1b3df8cdc419545c2077c932651.jpeg'},
+{name:'Full Coverage Concealer',desc:'Covers blemishes naturally.',price:'$10',rating:'⭐️⭐️⭐️⭐️',img:'https://tse1.mm.bing.net/th/id/OIP.TVyqG3lH1LAw6EfvdpenZAHaHa?pid=Api&P=0&h=220'}
+];
+products.splice(10,0,{ad:true,text:'🌸 Special Offer: Get 20% Off All Serums Today! Tap Here to Grab Now!'});
+function displayProducts(pList){
+document.getElementById('shop').innerHTML=pList.map((p,i)=>{
+if(p.ad){return `<div class='ad-banner' onclick="alert('Redirecting to Offer...')">${p.text}</div>`;}
+let image = p.img ? p.img : `https://via.placeholder.com/400x400?text=${encodeURIComponent(p.name)}`;
+return `<div class='product'><img src='${image}' alt='${p.name}'/><h2>${p.name}</h2><p>${p.desc}</p><p>${p.price}</p><p>${p.rating}</p><button onclick='addToCart(${i})'>Add to Cart</button></div>`;}).join('');
+}
+displayProducts(products);
+let cart=[];
+function searchProducts(){const val=document.getElementById('search').value.toLowerCase();const filtered=products.filter(p=>p.name && p.name.toLowerCase().includes(val));displayProducts(filtered);}
+function addToCart(i){cart.push(products[i]);document.getElementById('cart-count').innerText=cart.length;localStorage.setItem('cart',JSON.stringify(cart));alert(products[i].name+' added to cart');}
+function showCart(){const c=JSON.parse(localStorage.getItem('cart'))||[];alert('You have '+c.length+' item(s) in your cart.');}
+</script>
+</body>
+</html>
